@@ -10,7 +10,7 @@ class IdeasContainer extends Component {
         this.state = {
             ideas: [],
             editingIdeaId: null,
-
+            notification: ''
         }
     }
 // this is where I'll get the ideas from the API
@@ -32,15 +32,26 @@ class IdeasContainer extends Component {
         .catch(error=> console.log(error))
     }
 
+    updateIdea = (idea) => {
+        const ideaIndex = this.state.ideas.findIndex(x => x.id === idea.id)
+        const ideas = update(this.state.ideas,{[ideaIndex]: { $set: idea}})
+        this.setState({ideas: ideas, notification: 'Changes saved!'})
+    }
+    resetNotification = () => {this.setState({notification: ''})}
+
   render() {
     return (
       <div>
         <div>
             <button className='newIdeaButton' onClick={this.addNewIdea}>New Idea</button>
+            <span className='notification'>
+                {this.state.notification}
+            </span>
         </div>
         {this.state.ideas.map((idea) => {
             if(this.state.editingIdeaId === idea.id) {
-                return(<IdeaForm idea={idea} key={idea.id} />)
+                return(<IdeaForm idea={idea} key={idea.id} updateIdea={this.updateIdea} 
+                    resetNotification={this.resetNotification} />)
             } else {
                 return(<Idea idea={idea} key={idea.id}/>)
             }
